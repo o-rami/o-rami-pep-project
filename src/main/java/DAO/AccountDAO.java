@@ -11,7 +11,10 @@ import java.util.ArrayList;
 
 public class AccountDAO {
 
-
+    // User registration
+    public Account createAccount(Account account) {
+        return null;
+    }
 
 }
 
