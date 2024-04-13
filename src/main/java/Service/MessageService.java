@@ -15,7 +15,16 @@ public class MessageService {
         this.messageDao = messageDao;
     }
 
-    public Message addMessage(Message message) {
+    public Message createMessage(Message message) {
+        if (message.getMessage_text().isBlank() 
+            || message.getMessage_text().isEmpty()
+            || message.getMessage_text().length() > 255) {
+            return null;
+        }
+        if (messageDao.getAllMessagesByUserId(message.getPosted_by()).isEmpty()) {
+            return null;
+        }
+
         List<Message> messages = messageDao.getAllMessages();
         if (messages.contains(message)) {
             return null;
