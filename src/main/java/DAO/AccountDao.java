@@ -7,7 +7,7 @@ import java.sql.*;
 
 
 
-public class AccountDAO {
+public class AccountDao {
 
     // User registration
     public Account createAccount(Account account) {
