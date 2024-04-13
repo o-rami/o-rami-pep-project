@@ -9,6 +9,7 @@ import Model.Message;
 import Service.MessageService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 // import Service.AccountService;
@@ -35,11 +36,12 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         // app.post("/login", )
+        // app.post("/register", )
         app.post("/messages", this::createMessageHandler);
         app.get("/messages", this::getAllMessagesHandler);
         app.get("/messages/{message_id}", this::getMessageHandler);
         app.get("/accounts/{account_id}/messages", this::getAllMessagesByUserIdHandler);
-        // app.patch("/messages/{message_id}", this::updateMessageBodyHandler);
+        app.patch("/messages/{message_id}", this::updateMessageBodyHandler);
         app.delete("messages/{message_id}", this::deleteMessageByIdHandler);
         
 
@@ -75,6 +77,29 @@ public class SocialMediaController {
             ctx.json(message);
         }
     }
+
+    private void updateMessageBodyHandler(Context ctx) throws JsonMappingException, JsonProcessingException {
+        int messageId = Integer.parseInt(Objects.requireNonNull(ctx.pathParam("message_id")));
+        Message message = messageService.getMessageById(messageId);
+        ObjectMapper mapper = new ObjectMapper();
+        Message messageWithText = mapper.readValue(ctx.body(), Message.class);
+
+        if (message != null 
+        && messageWithText.getMessage_text().length() <= 255
+        && !messageWithText.getMessage_text().isEmpty()) {
+            ctx.json(messageService.updateMessage(message.getMessage_id(), 
+                new Message(
+                    message.getMessage_id(),
+                    message.getPosted_by(),
+                    messageWithText.getMessage_text(),
+                    message.getTime_posted_epoch()
+            )));
+        } else {
+            ctx.status(400);
+        }
+        
+    }
+
 
     private void deleteMessageByIdHandler(Context ctx) {
         int messageId = Integer.parseInt(Objects.requireNonNull(ctx.pathParam("message_id")));
