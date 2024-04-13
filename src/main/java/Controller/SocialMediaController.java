@@ -30,6 +30,7 @@ public class SocialMediaController {
         this.messageService = new MessageService();
         this.accountService = new AccountService();
     }
+    
     /**
      * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
      * suite must receive a Javalin object from this method.
@@ -37,7 +38,7 @@ public class SocialMediaController {
      */
     public Javalin startAPI() {
         Javalin app = Javalin.create();
-        // app.post("/register", )
+        app.post("/register", this::registrationHandler);
         app.post("/login", this::loginHandler);
         app.post("/messages", this::createMessageHandler);
         app.get("/messages", this::getAllMessagesHandler);
@@ -45,12 +46,22 @@ public class SocialMediaController {
         app.get("/accounts/{account_id}/messages", this::getAllMessagesByUserIdHandler);
         app.patch("/messages/{message_id}", this::updateMessageBodyHandler);
         app.delete("messages/{message_id}", this::deleteMessageByIdHandler);
-        
-
         return app;
     }
 
-    private void loginHandler(Context ctx) throws JsonProcessingException {
+    private void registrationHandler(Context ctx) throws JsonMappingException, JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(ctx.body(), Account.class);
+        Account accountToRegister = accountService.createAccount(account);
+        if (accountToRegister != null) {
+            ctx.json(mapper.writeValueAsString(accountToRegister));
+        } else {
+            ctx.status(400);
+        }
+    }
+
+
+    private void loginHandler(Context ctx) throws JsonProcessingException, JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
         Account accountToLogin = accountService.getAccountByUsername(account.getUsername());
@@ -63,7 +74,7 @@ public class SocialMediaController {
         ctx.status(401);
     }
 
-    private void createMessageHandler(Context ctx) throws JsonProcessingException {
+    private void createMessageHandler(Context ctx) throws JsonProcessingException, JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Message message = mapper.readValue(ctx.body(), Message.class);
         Message createdMessage = messageService.createMessage(message);
@@ -112,9 +123,7 @@ public class SocialMediaController {
         } else {
             ctx.status(400);
         }
-        
     }
-
 
     private void deleteMessageByIdHandler(Context ctx) {
         int messageId = Integer.parseInt(Objects.requireNonNull(ctx.pathParam("message_id")));

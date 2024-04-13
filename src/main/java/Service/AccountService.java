@@ -21,6 +21,14 @@ public class AccountService {
         if (accounts.contains(account)) {
             return null;
         }
+        if (accountDao.getAccountByUsername(account.getUsername()) != null) {
+            return null;
+        }
+        if (account.getUsername().isBlank() 
+            || account.getUsername().isEmpty() 
+            || account.getPassword().length() < 4) {
+                return null;
+        }
         return accountDao.createAccount(account);
     }
 
