@@ -56,6 +56,8 @@ public class SocialMediaController {
     private void getMessageHandler(Context ctx) {
         int messageId = Integer.parseInt(Objects.requireNonNull(ctx.pathParam("message_id")));
         Message message = messageService.getMessageById(messageId);
-        ctx.json(message);
+        if (message != null) {
+            ctx.json(message);
+        }
     }
 }
