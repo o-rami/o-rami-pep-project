@@ -54,13 +54,13 @@ public class SocialMediaController {
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
         Account accountToLogin = accountService.getAccountByUsername(account.getUsername());
-        if (accountToLogin != null)
+        if (accountToLogin != null) {
             if (account.getPassword().equals(accountToLogin.getPassword())) {
                 ctx.json(mapper.writeValueAsString(accountToLogin));
+                return;
             }
-        } else {
-            ctx.status(401);
         }
+        ctx.status(401);
     }
 
     private void createMessageHandler(Context ctx) throws JsonProcessingException {
