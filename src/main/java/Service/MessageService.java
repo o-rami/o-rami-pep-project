@@ -44,5 +44,7 @@ public class MessageService {
         return message;
     }
 
-    public 
+    public boolean deleteMessageById(int messageId) {
+        return messageDao.deleteMessageById(messageId);
+    }
 }

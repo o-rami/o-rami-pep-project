@@ -169,9 +169,8 @@ public class MessageDao {
             int rowsAffected = ps.executeUpdate();
             
             if (rowsAffected == 0) {
-
+                return false;
             }
-
             return true;
 
         } catch (SQLException ex) {
