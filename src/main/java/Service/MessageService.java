@@ -27,8 +27,8 @@ public class MessageService {
         return messageDao.getAllMessages();
     }
 
-    public List<Message> getAllMessagesByAccount(int accountId) {
-        return messageDao.getAllMessagesByUser(accountId);
+    public List<Message> getAllMessagesByUserId(int accountId) {
+        return messageDao.getAllMessagesByUserId(accountId);
     }
 
     public Message getMessageById(int messageId) {

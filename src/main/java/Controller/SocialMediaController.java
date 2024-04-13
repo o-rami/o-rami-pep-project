@@ -3,6 +3,7 @@ package Controller;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import java.util.List;
+import java.util.Objects;
 
 import Model.Message;
 import Service.MessageService;
@@ -30,6 +31,12 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         app.get("/messages", this::getAllMessagesHandler);
+        app.get("/messages/{message_id}", this::getMessageHandler);
+        app.get("/accounts/{account_id}/messages", this::getAllMessagesByUserIdHandler);
+        // app.post("/login", )
+        // app.post("/messages", this.createMessageHandler);
+        // app.patch("/messages/{message_id}", this::updateMessageBodyHandler);
+        // app.delete("messages/{message_id}", this::deleteMessageByIdHandler);
         
 
         return app;
@@ -40,4 +47,15 @@ public class SocialMediaController {
         ctx.json(messages);
     }
 
+    private void getAllMessagesByUserIdHandler(Context ctx) {
+        int accountId = Integer.parseInt(Objects.requireNonNull(ctx.pathParam("account_id")));
+        List<Message> messages = messageService.getAllMessagesByUserId(accountId);
+        ctx.json(messages);
+    }
+
+    private void getMessageHandler(Context ctx) {
+        int messageId = Integer.parseInt(Objects.requireNonNull(ctx.pathParam("message_id")));
+        Message message = messageService.getMessageById(messageId);
+        ctx.json(message);
+    }
 }

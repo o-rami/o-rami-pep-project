@@ -74,7 +74,7 @@ public class MessageDao {
      * @TODO: Get all messages via account id
      * @return All messages from account with accountId
      */
-    public List<Message> getAllMessagesByUser(int accountId) {
+    public List<Message> getAllMessagesByUserId(int accountId) {
         Connection connection = ConnectionUtil.getConnection();
         List<Message> messages = new ArrayList<>();
 
