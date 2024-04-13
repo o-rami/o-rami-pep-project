@@ -64,11 +64,11 @@ public class MessageDao {
                 );
                 messages.add(message);
                 }
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-            return messages;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
         }
+        return messages;
+    }
     
     /*
      * @TODO: Get all messages via account id

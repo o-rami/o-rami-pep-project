@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Objects;
 
 import Model.Message;
+import Model.Account;
 import Service.MessageService;
+import Service.AccountService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -22,11 +24,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class SocialMediaController {
     MessageService messageService;
-    // AccountService accountService;
+    AccountService accountService;
 
     public SocialMediaController() {
         this.messageService = new MessageService();
-        // this.accountService = new AccountService();
+        this.accountService = new AccountService();
     }
     /**
      * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
@@ -35,17 +37,30 @@ public class SocialMediaController {
      */
     public Javalin startAPI() {
         Javalin app = Javalin.create();
-        // app.post("/login", )
         // app.post("/register", )
+        app.post("/login", this::loginHandler);
         app.post("/messages", this::createMessageHandler);
         app.get("/messages", this::getAllMessagesHandler);
-        app.get("/messages/{message_id}", this::getMessageHandler);
+        app.get("/messages/{message_id}", this::getMessageByIdHandler);
         app.get("/accounts/{account_id}/messages", this::getAllMessagesByUserIdHandler);
         app.patch("/messages/{message_id}", this::updateMessageBodyHandler);
         app.delete("messages/{message_id}", this::deleteMessageByIdHandler);
         
 
         return app;
+    }
+
+    private void loginHandler(Context ctx) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(ctx.body(), Account.class);
+        Account accountToLogin = accountService.getAccountByUsername(account.getUsername());
+        if (accountToLogin != null)
+            if (account.getPassword().equals(accountToLogin.getPassword())) {
+                ctx.json(mapper.writeValueAsString(accountToLogin));
+            }
+        } else {
+            ctx.status(401);
+        }
     }
 
     private void createMessageHandler(Context ctx) throws JsonProcessingException {
@@ -70,7 +85,7 @@ public class SocialMediaController {
         ctx.json(messages);
     }
 
-    private void getMessageHandler(Context ctx) {
+    private void getMessageByIdHandler(Context ctx) {
         int messageId = Integer.parseInt(Objects.requireNonNull(ctx.pathParam("message_id")));
         Message message = messageService.getMessageById(messageId);
         if (message != null) {
